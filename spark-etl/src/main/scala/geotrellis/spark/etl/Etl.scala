@@ -179,6 +179,10 @@ case class Etl(conf: EtlConf, @transient modules: Seq[TypedModule] = Etl.default
             val LayoutLevel(zoom, layoutDefinition) = scheme.levelForZoom(output.maxZoom.get)
             zoom -> resizingTileRDD(reprojected, floatMD, layoutDefinition)
 
+          case Left(scheme: AnchoredLayoutScheme) => // True for both FloatinglayoutScheme and ZoomedlayoutScheme
+            val LayoutLevel(zoom, layoutDefinition) = scheme.levelFor(floatMD.extent, floatMD.cellSize)
+            zoom -> resizingTileRDD(reprojected, floatMD, layoutDefinition)
+
           case Left(scheme) => // True for both FloatinglayoutScheme and ZoomedlayoutScheme
             val LayoutLevel(zoom, layoutDefinition) = scheme.levelFor(floatMD.extent, floatMD.cellSize)
             zoom -> resizingTileRDD(reprojected, floatMD, layoutDefinition)

@@ -19,11 +19,12 @@ package geotrellis.spark.etl
 import geotrellis.raster.{CellSize, CellType}
 import geotrellis.raster.resample.NearestNeighbor
 import geotrellis.spark.etl.config._
+import geotrellis.spark.tiling.AnchoredLayoutScheme
 import geotrellis.vector.Extent
 import org.apache.spark.storage.StorageLevel
 import org.scalatest._
 
-object EtlSpec {
+class EtlSpec extends FunSuite {
   // Test that ETL module can be instantiated in convenient ways
   val profiles = List(
     AccumuloProfile("accumulo-name", "instance", "zookeepers", "user", "password"),
@@ -74,4 +75,24 @@ object EtlSpec {
 
   Etl(etlConf)
   Etl(etlConf, List(s3.S3Module, hadoop.HadoopModule))
+
+  test("Can create Etl object given anchored layout and a specified layout extent") {
+
+    val etl = Etl(new EtlConf(
+      input = input,
+      output = output.copy(layoutScheme = Some("anchored"), maxZoom = None)
+    ))
+
+    assert(etl.output.layoutScheme.isDefined)
+    assert(etl.output.getLayoutScheme.isInstanceOf[AnchoredLayoutScheme])
+  }
+
+  test("Can't create ETL object given anchored layout and no specified layout extent") {
+    intercept[Exception] {
+      Etl(new EtlConf(
+        input = input,
+        output = output.copy(layoutScheme = Some("anchored"), layoutExtent = None)
+      ))
+    }
+  }
 }

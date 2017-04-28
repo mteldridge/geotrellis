@@ -47,13 +47,16 @@ case class Output(
 
   require(maxZoom.isEmpty || layoutScheme == Some("zoomed"),
     "maxZoom can only be used with 'zoomed' layoutScheme")
+  require(layoutExtent.isDefined || layoutScheme == Some("anchored"),
+    "layoutExtent must be used with 'zoomed' layoutScheme")
 
   def getCrs = crs.map(CRS.fromName)
 
-  def getLayoutScheme: LayoutScheme = (layoutScheme, getCrs, resolutionThreshold) match {
-    case (Some("floating"), _, _)            => FloatingLayoutScheme(tileSize)
-    case (Some("zoomed"), Some(c), Some(rt)) => ZoomedLayoutScheme(c, tileSize, rt)
-    case (Some("zoomed"), Some(c), _)        => ZoomedLayoutScheme(c, tileSize)
+  def getLayoutScheme: LayoutScheme = (layoutScheme, getCrs, resolutionThreshold, layoutExtent) match {
+    case (Some("floating"), _, _, _)            => FloatingLayoutScheme(tileSize)
+    case (Some("anchored"), _, _, Some(le))     => AnchoredLayoutScheme(tileSize, le)
+    case (Some("zoomed"), Some(c), Some(rt), _) => ZoomedLayoutScheme(c, tileSize, rt)
+    case (Some("zoomed"), Some(c), _, _)        => ZoomedLayoutScheme(c, tileSize)
     case _ => throw new Exception("unsupported layout scheme definition")
   }
 
