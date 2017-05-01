@@ -35,16 +35,16 @@ object AnchoredLayoutScheme {
     new AnchoredLayoutScheme(tileCols, tileRows, anchoredExtent)
 }
 
-class AnchoredLayoutScheme(tileCols: Int, tileRows: Int, anchoredExtent: Extent) extends LayoutScheme {
+class AnchoredLayoutScheme(tileCols: Int, tileRows: Int, val anchoredExtent: Extent) extends FloatingLayoutScheme(tileCols,tileRows) {
 
   /** @param extent is ignored, uses ''anchoredExtent'' */
-  def levelFor(extent: Extent, cellSize: CellSize) =
+  override def levelFor(extent: Extent, cellSize: CellSize) =
     0 -> LayoutDefinition(GridExtent(anchoredExtent, cellSize), tileCols, tileRows)
 
-  def zoomOut(level: LayoutLevel) =
+  override def zoomOut(level: LayoutLevel) =
     throw new UnsupportedOperationException("zoomOut not supported for FloatingLayoutScheme")
 
-  def zoomIn(level: LayoutLevel) =
+  override def zoomIn(level: LayoutLevel) =
     throw new UnsupportedOperationException("zoomIn not supported for FloatingLayoutScheme")
 }
 
