@@ -25,21 +25,24 @@ import geotrellis.vector.Extent
 object AnchoredLayoutScheme {
   val DEFAULT_TILE_SIZE = 256
 
-  def apply( anchoredExtent: Extent): AnchoredLayoutScheme =
-    apply(DEFAULT_TILE_SIZE, anchoredExtent)
+  def apply( anchoredExtent: Extent, cellSize: CellSize): AnchoredLayoutScheme =
+    apply(DEFAULT_TILE_SIZE, anchoredExtent, cellSize)
 
-  def apply(tileSize: Int, anchoredExtent: Extent): AnchoredLayoutScheme =
-    apply(tileSize, tileSize, anchoredExtent)
+  def apply(tileSize: Int, anchoredExtent: Extent, cellSize: CellSize): AnchoredLayoutScheme =
+    apply(tileSize, tileSize, anchoredExtent, cellSize)
 
-  def apply(tileCols: Int, tileRows: Int, anchoredExtent: Extent): AnchoredLayoutScheme =
-    new AnchoredLayoutScheme(tileCols, tileRows, anchoredExtent)
+  def apply(tileCols: Int, tileRows: Int, anchoredExtent: Extent, cellSize: CellSize): AnchoredLayoutScheme =
+    new AnchoredLayoutScheme(tileCols, tileRows, anchoredExtent, cellSize)
 }
 
-class AnchoredLayoutScheme(tileCols: Int, tileRows: Int, val anchoredExtent: Extent) extends FloatingLayoutScheme(tileCols,tileRows) {
+class AnchoredLayoutScheme(tileCols: Int, tileRows: Int, val anchoredExtent: Extent, val cellSize: CellSize)
+  extends FloatingLayoutScheme(tileCols,tileRows) {
 
-  /** @param extent is ignored, uses ''anchoredExtent'' */
+  /** @param extent is ignored, uses ''this.anchoredExtent''
+    * @param cellSize is ignored.  uses ''this.cellSize''
+    * */
   override def levelFor(extent: Extent, cellSize: CellSize) =
-    0 -> LayoutDefinition(GridExtent(anchoredExtent, cellSize), tileCols, tileRows)
+    0 -> LayoutDefinition(GridExtent(anchoredExtent, this.cellSize), tileCols, tileRows)
 
   override def zoomOut(level: LayoutLevel) =
     throw new UnsupportedOperationException("zoomOut not supported for FloatingLayoutScheme")

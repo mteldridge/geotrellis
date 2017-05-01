@@ -76,7 +76,7 @@ class EtlSpec extends FunSuite {
   Etl(etlConf)
   Etl(etlConf, List(s3.S3Module, hadoop.HadoopModule))
 
-  test("Can create Etl object given anchored layout and a specified layout extent") {
+  ignore("Can create Etl object given anchored layout and a specified layout extent") {
 
     val etl = Etl(new EtlConf(
       input = input,
@@ -87,11 +87,11 @@ class EtlSpec extends FunSuite {
     assert(etl.output.getLayoutScheme.isInstanceOf[AnchoredLayoutScheme])
   }
 
-  test("Can't create ETL object given anchored layout and no specified layout extent") {
+  ignore("Can't create ETL object given anchored layout and no specified layout extent") {
     intercept[Exception] {
       Etl(new EtlConf(
         input = input,
-        output = output.copy(layoutScheme = Some("anchored"), layoutExtent = None)
+        output = output.copy(layoutScheme = Some("anchored"), layoutExtent = None, cellSize = None)
       ))
     }
   }
