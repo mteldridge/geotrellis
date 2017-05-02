@@ -45,7 +45,16 @@ case class Output(
   maxZoom: Option[Int] = None
 ) extends Serializable {
 
-  require(maxZoom.isEmpty || layoutScheme == Some("zoomed"),
+  layoutScheme match {
+    case Some("floating") => require(maxZoom.isEmpty, "maxZoom can only be used with 'zoomed' layoutScheme")
+    case Some("anchored") => {
+      require(maxZoom.isEmpty, "maxZoom can only be used with 'zoomed' layoutScheme")
+      require(cellSize.isDefined && layoutExtent.isDefined, "'anchored' layoutScheme requires cellSize and layoutExtent")
+    }
+    case _ => ()
+  }
+
+  require((maxZoom.isEmpty || layoutScheme == Some("zoomed")),
     "maxZoom can only be used with 'zoomed' layoutScheme")
 
   def getCrs = crs.map(CRS.fromName)
