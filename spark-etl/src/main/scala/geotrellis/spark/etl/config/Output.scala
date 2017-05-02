@@ -18,12 +18,11 @@ package geotrellis.spark.etl.config
 
 import geotrellis.proj4.CRS
 import geotrellis.raster.resample.PointResampleMethod
-import geotrellis.raster.{CellSize, CellType, RasterExtent}
+import geotrellis.raster.{CellSize, CellType, RasterExtent, TileLayout}
 import geotrellis.spark.io.index.{HilbertKeyIndexMethod, KeyIndexMethod, RowMajorKeyIndexMethod, ZCurveKeyIndexMethod}
 import geotrellis.spark.pyramid.Pyramid
 import geotrellis.spark.tiling._
 import geotrellis.vector.Extent
-
 import org.apache.spark.HashPartitioner
 
 case class Output(
@@ -42,7 +41,8 @@ case class Output(
   cellType: Option[CellType] = None,
   encoding: Option[String] = None,
   breaks: Option[String] = None,
-  maxZoom: Option[Int] = None
+  maxZoom: Option[Int] = None,
+  tileLayout: Option[TileLayout] = None
 ) extends Serializable {
 
   layoutScheme match {
@@ -59,11 +59,12 @@ case class Output(
 
   def getCrs = crs.map(CRS.fromName)
 
-  def getLayoutScheme: LayoutScheme = (layoutScheme, getCrs, resolutionThreshold, layoutExtent, cellSize) match {
-    case (Some("floating"), _, _, _, _)            => FloatingLayoutScheme(tileSize)
-    case (Some("anchored"), _, _, Some(le), Some(cs))     => AnchoredLayoutScheme(tileSize, le, cs)
-    case (Some("zoomed"), Some(c), Some(rt), _, _) => ZoomedLayoutScheme(c, tileSize, rt)
-    case (Some("zoomed"), Some(c), _, _, _)        => ZoomedLayoutScheme(c, tileSize)
+  def getLayoutScheme: LayoutScheme = (layoutScheme, getCrs, resolutionThreshold, layoutExtent, cellSize, tileLayout) match {
+    case (Some("floating"), _, _, _, _, _)            => FloatingLayoutScheme(tileSize)
+    case (Some("anchored"), _, _, Some(le), Some(cs),_)     => AnchoredLayoutScheme(tileSize, le, cs)
+    case (Some("anchored"), _, _, Some(le), _, Some(tl))     => AnchoredLayoutScheme(tileSize, le, tl)
+    case (Some("zoomed"), Some(c), Some(rt), _, _, _) => ZoomedLayoutScheme(c, tileSize, rt)
+    case (Some("zoomed"), Some(c), _, _, _, _)        => ZoomedLayoutScheme(c, tileSize)
     case _ => throw new Exception("unsupported layout scheme definition")
   }
 
