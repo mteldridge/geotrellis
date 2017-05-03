@@ -35,7 +35,7 @@ object AnchoredLayoutScheme {
   }
 }
 
-class AnchoredLayoutScheme(layout:LayoutDefinition) extends FloatingLayoutScheme(layout.tileCols,layout.tileRows) {
+class AnchoredLayoutScheme(val layout:LayoutDefinition) extends FloatingLayoutScheme(layout.tileCols,layout.tileRows) {
 
   /** @param extent is ignored, uses ''layout.extent''
     * @param cellSize is ignored.  uses ''layout.cellSize''

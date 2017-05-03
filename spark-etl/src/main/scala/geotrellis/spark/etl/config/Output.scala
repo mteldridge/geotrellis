@@ -45,31 +45,31 @@ case class Output(
   tileLayout: Option[TileLayout] = None
 ) extends Serializable {
 
+  // prerequirements
   layoutScheme match {
     case Some("floating") => require(maxZoom.isEmpty, "maxZoom can only be used with 'zoomed' layoutScheme")
     case Some("anchored") => {
       require(maxZoom.isEmpty, "maxZoom can only be used with 'zoomed' layoutScheme")
-      require(cellSize.isDefined && layoutExtent.isDefined, "'anchored' layoutScheme requires cellSize and layoutExtent")
+      require(layoutExtent.isDefined, "'anchored layoutScheme requires layoutExtent")
+      require(cellSize.isDefined || tileLayout.isDefined, "'anchored' layoutScheme requires cellSize or tileLayout")
     }
     case _ => ()
   }
 
-  require((maxZoom.isEmpty || layoutScheme == Some("zoomed")),
-    "maxZoom can only be used with 'zoomed' layoutScheme")
-
   def getCrs = crs.map(CRS.fromName)
 
   def getLayoutScheme: LayoutScheme = (layoutScheme, getCrs, resolutionThreshold, layoutExtent, cellSize, tileLayout) match {
-    case (Some("floating"), _, _, _, _, _)            => FloatingLayoutScheme(tileSize)
-    case (Some("anchored"), _, _, Some(le), Some(cs),_)     => AnchoredLayoutScheme(tileSize, le, cs)
-    case (Some("anchored"), _, _, Some(le), _, Some(tl))     => AnchoredLayoutScheme(tileSize, le, tl)
-    case (Some("zoomed"), Some(c), Some(rt), _, _, _) => ZoomedLayoutScheme(c, tileSize, rt)
-    case (Some("zoomed"), Some(c), _, _, _, _)        => ZoomedLayoutScheme(c, tileSize)
-    case _ => throw new Exception("unsupported layout scheme definition")
+    case (Some("floating"), _, _, _, _, _)               => FloatingLayoutScheme(tileSize)
+    case (Some("anchored"), _, _, Some(le), Some(cs), _) => AnchoredLayoutScheme(tileSize, le, cs)
+    case (Some("anchored"), _, _, Some(le), _, Some(tl)) => AnchoredLayoutScheme(le, tl)
+    case (Some("zoomed"), Some(c), Some(rt), _, _, _)    => ZoomedLayoutScheme(c, tileSize, rt)
+    case (Some("zoomed"), Some(c), _, _, _, _)           => ZoomedLayoutScheme(c, tileSize)
+    case _                                               => throw new Exception("unsupported layout scheme definition")
   }
 
-  def getLayoutDefinition = (layoutExtent, cellSize) match {
-    case (Some(le), Some(cs)) => LayoutDefinition(RasterExtent(le, cs), tileSize)
+  def getLayoutDefinition = (layoutExtent, cellSize, tileLayout) match {
+    case (Some(le), Some(cs), _) => LayoutDefinition(RasterExtent(le, cs), tileSize)
+    case (Some(le), _, Some(tl)) => LayoutDefinition(le, tl)
     case _ => throw new Exception("unsupported layout definition")
   }
 
