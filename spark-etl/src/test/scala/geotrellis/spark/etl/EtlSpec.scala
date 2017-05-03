@@ -16,6 +16,7 @@
 
 package geotrellis.spark.etl
 
+import geotrellis.proj4.{LatLng, Sinusoidal}
 import geotrellis.raster.{CellSize, CellType}
 import geotrellis.raster.resample.NearestNeighbor
 import geotrellis.spark.etl.config._
@@ -105,6 +106,15 @@ class EtlSpec extends FunSuite {
         input = input,
         output = output.copy(layoutScheme = Some("anchored"))
       ))
+    }
+  }
+
+  test("OutputPlugin.getCrs should handle proj4 strings") {
+    assert(output.copy(crs = Some("EPSG:4326")).getCrs === Some(LatLng))
+    assert(output.copy(crs = Some(Sinusoidal.toProj4String)).getCrs === Some(Sinusoidal))
+    assert(output.copy(crs = None).getCrs === None)
+    intercept[Exception] {
+      output.copy(crs = Some("BAD:CRS")).getCrs
     }
   }
 }

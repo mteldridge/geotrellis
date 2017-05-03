@@ -25,6 +25,8 @@ import geotrellis.spark.tiling._
 import geotrellis.vector.Extent
 import org.apache.spark.HashPartitioner
 
+import scala.util.Try
+
 case class Output(
   backend: Backend,
   resampleMethod: PointResampleMethod,
@@ -56,7 +58,7 @@ case class Output(
     case _ => ()
   }
 
-  def getCrs = crs.map(CRS.fromName)
+  def getCrs = crs.map(c => Try(CRS.fromName(c)) getOrElse CRS.fromString(c))
 
   def getLayoutScheme: LayoutScheme = (layoutScheme, getCrs, resolutionThreshold, layoutExtent, cellSize, tileLayout) match {
     case (Some("floating"), _, _, _, _, _)               => FloatingLayoutScheme(tileSize)
