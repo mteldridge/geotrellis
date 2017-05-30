@@ -180,8 +180,8 @@ case class Etl(conf: EtlConf, @transient modules: Seq[TypedModule] = Etl.default
             zoom -> resizingTileRDD(reprojected, floatMD, layoutDefinition)
 
           case Left(scheme: AnchoredLayoutScheme) =>
-            // since I don't know if resizingTileRDD uses md.extent, I will be sure to set it here.
-            val md = floatMD.copy(extent = scheme.layout.extent)
+            // update layout and extent in the metadata (is this enough?).
+            val md = floatMD.copy(layout = scheme.layout, extent = scheme.layout.extent)
             val LayoutLevel(zoom, layoutDefinition) = scheme.levelFor(md.extent, md.cellSize)
             zoom -> resizingTileRDD(reprojected, md, layoutDefinition)
 
