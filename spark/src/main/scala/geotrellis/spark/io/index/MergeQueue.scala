@@ -21,7 +21,7 @@ import scala.collection.TraversableOnce
 object MergeQueue{
   def apply(ranges: TraversableOnce[(Long, Long)]): Seq[(Long, Long)] = {
     val q = new MergeQueue()
-    ranges.foreach(range => q += range)
+    ranges.toSeq.sortBy(_._1).foreach(range => q += range)
     q.toSeq
   }
 }
