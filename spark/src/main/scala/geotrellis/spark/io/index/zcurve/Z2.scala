@@ -18,6 +18,8 @@ package geotrellis.spark.io.index.zcurve
 
 import geotrellis.spark.io.index.MergeQueue
 
+import scala.collection.mutable.ListBuffer
+
 class Z2(val z: Long) extends AnyVal {
   import Z2._
 
@@ -99,7 +101,7 @@ object Z2 {
 
   /** Recurse down the quad-tree and report all z-ranges which are contained in the rectangle defined by the min and max points */
   def zranges(min: Z2, max: Z2): Seq[(Long, Long)] = {
-    val mq = new MergeQueue
+    val ranges = ListBuffer[(Long,Long)]()
     val sr = Z2Range(min, max)
 
     var recCounter = 0
@@ -113,7 +115,7 @@ object Z2 {
       
       val qr = Z2Range(new Z2(min), new Z2(max))
       if (sr contains qr){                         // whole range matches, happy day
-        mq += (qr.min.z, qr.max.z)
+        ranges.append((qr.min.z, qr.max.z))
         reportCounter +=1
       } else if (offset > 0 && (sr overlaps qr)) { // some portion of this range are excluded
         _zranges(min, offset - MAX_DIM, 0)
@@ -127,6 +129,6 @@ object Z2 {
     var prefix: Long = 0
     var offset = MAX_BITS*MAX_DIM                
     _zranges(prefix, offset, 0) // the entire space
-    mq.toSeq
+    MergeQueue(ranges)
   }
 }
