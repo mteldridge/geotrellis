@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Azavea
+ * Copyright 2017 Azavea
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package geotrellis.proj4
+package geotrellis.raster.render
 
-import java.util.concurrent.ConcurrentHashMap;
+import geotrellis.raster.Tile
+import geotrellis.raster.render.ascii.AsciiArtEncoder
+import geotrellis.util.MethodExtensions
 
 /**
- * @author Manuri Perera
+ * Extension methods on [[Tile]] for printing a representation as ASCII
+ * ranged characters or numerical values.
+ * @since 9/6/17
  */
-@deprecated("This will be removed in 2.0", "1.2")
-class Memoize[T, R](f: T => R) extends (T => R) {
-  val map: ConcurrentHashMap[T, R] = new ConcurrentHashMap()
+trait AsciiRenderMethods extends MethodExtensions[Tile] {
 
-  def apply(x: T): R = {
-    if (map.contains(x)) map.get(x)
-    else {
-      val y = f(x)
-      map.put(x, y)
-      y
-    }
-  }
+  def renderAscii(palette: AsciiArtEncoder.Palette = AsciiArtEncoder.Palette.WIDE): String =
+    AsciiArtEncoder.encode(self, palette)
+
 }
-

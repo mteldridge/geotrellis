@@ -27,17 +27,17 @@ lazy val commonSettings = Seq(
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
 
-  publishTo := {
-    val sonatype = "https://oss.sonatype.org/"
-    val locationtech = "https://repo.locationtech.org/content/repositories"
-    if (isSnapshot.value) {
-      // Publish snapshots to LocationTech
-      Some("LocationTech Snapshot Repository" at s"${locationtech}/geotrellis-snapshots")
-    } else {
-      // Publish releases to Sonatype
-      Some("Sonatype Release Repository" at s"${sonatype}service/local/staging/deploy/maven2")
-    }
-  },
+//  publishTo := {
+//    val sonatype = "https://oss.sonatype.org/"
+//    val locationtech = "https://repo.locationtech.org/content/repositories"
+//    if (isSnapshot.value) {
+//      // Publish snapshots to LocationTech
+//      Some("LocationTech Snapshot Repository" at s"${locationtech}/geotrellis-snapshots")
+//    } else {
+//      // Publish releases to Sonatype
+//      Some("Sonatype Release Repository" at s"${sonatype}service/local/staging/deploy/maven2")
+//    }
+//  },
 
   credentials ++= List(Path.userHome / ".ivy2" / ".credentials")
     .filter(_.asFile.canRead)
